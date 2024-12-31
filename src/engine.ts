@@ -97,7 +97,10 @@ export class PyEnvInstaller {
       const cache_version = this.pyenv_version;
       const cached_archive = tc.find(cache_key, cache_version);
 
+      console.log(`1. Key ${cache_key}, version: ${cache_version}`);
+
       if (cached_archive) {
+          console.log("2");
         return accept(path.join(cached_archive, cache_key));
       }
       console.log(`downloading ${this.archive_url}`);
@@ -108,6 +111,7 @@ export class PyEnvInstaller {
               if (!utils.folder_exists(cached_path)) {
                 return reject(new Error(`${cached_path} does not exist`));
               }
+              console.log("3");
               accept(path.join(cached_path, cache_key));
             })
             .catch(error => {
@@ -130,6 +134,7 @@ export class PyEnvInstaller {
   async installFromArchive(archive_path: string): Promise<string> {
     return new Promise<string>((accept, reject) => {
       const cached_pyenv_root = tc.find('pyenv_root', this.pyenv_version);
+      console.log("4");
       if (cached_pyenv_root) {
         return accept(cached_pyenv_root);
       }
@@ -150,6 +155,7 @@ export class PyEnvInstaller {
 
           tc.cacheDir(deflated_location, 'pyenv_root', this.pyenv_version)
             .then(pyenv_root => {
+                console.log("5");
               core.setOutput('pyenv_root', pyenv_root);
               accept(pyenv_root);
             })
@@ -294,6 +300,7 @@ export class EnvironmentManager {
 
       const cache_key = `pyenv-${this.pyenv_version}-python`;
       const cache_version = version;
+      console.log(`6. key: ${cache_key}, version: ${cache_version}`);
 
       const cached_python = tc.find(cache_key, cache_version);
       if (cached_python) {
@@ -310,6 +317,7 @@ export class EnvironmentManager {
             cache_key,
             cache_version
           ).then(cached_path => {
+              console.log("7. cached");
             this.run_command_in_python_version(version)
               .then(() => {
                 accept(cached_path);
